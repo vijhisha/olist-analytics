@@ -1,0 +1,37 @@
+[sqlfluff]
+templater = dbt
+dialect = bigquery
+sql_file_exts = .sql
+max_line_length = 120
+
+# Use trailing commas, lower-case keywords
+rules = all
+
+[sqlfluff:indentation]
+indent_unit = space
+tab_space_size = 4
+
+[sqlfluff:layout:type:comma]
+# trailing commas
+line_position = trailing
+
+[sqlfluff:templater:dbt]
+project_dir = dbt/
+
+[sqlfluff:rules:capitalisation.keywords]
+capitalisation_policy = lower
+
+[sqlfluff:rules:capitalisation.identifiers]
+capitalisation_policy = lower
+
+[sqlfluff:rules:capitalisation.functions]
+capitalisation_policy = lower
+
+[sqlfluff:rules:capitalisation.literals]
+capitalisation_policy = lower
+
+[sqlfluff:rules:capitalisation.types]
+capitalisation_policy = lower
+
+[sqlfluff:rules:convention.select_trailing_comma]
+select_clause_trailing_comma = require

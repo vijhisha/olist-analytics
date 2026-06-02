@@ -1,0 +1,33 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Secrets & credentials
+.env
+*.json
+!dbt/packages.yml
+
+# dbt
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
+
+# DuckDB
+*.duckdb
+.duckdb/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Notebooks checkpoints
+.ipynb_checkpoints/
+
+# Analysis outputs (keep figures dir, ignore generated files)
+analysis/figures/*.png
+analysis/figures/*.svg
