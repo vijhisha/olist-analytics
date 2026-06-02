@@ -2,6 +2,8 @@
 
 > This document is the build plan for **Claude Code**. Read it fully, then work **one phase at a time**, in order. After each phase: run the phase's acceptance checks, summarize what you did, make a git commit, and stop for my review before starting the next phase. Do **not** skip ahead or do everything in one pass.
 
+> **Session continuity:** At the start of every session, read `project_log.md` before doing anything else — it records the exact current phase, last commit, and any environment quirks. After every `git commit`, update `project_log.md` to reflect the new state and include the update in that same commit (or the immediately following one).
+
 ---
 
 ## 1. What we're building and why
