@@ -8,9 +8,9 @@
 
 | Field | Value |
 |---|---|
-| **Current phase** | Phase 2 complete — ready for Phase 3 |
-| **Next action** | Implement intermediate + dimensional models (Phase 3) |
-| **Last commit** | `81166b4` — feat: Phase 2 staging |
+| **Current phase** | Phase 3 complete — ready for Phase 4 |
+| **Next action** | Implement analytics marts (Phase 4) |
+| **Last commit** | `(see below)` — feat: Phase 3 intermediate + dimensional core |
 | **Branch** | `master` |
 | **Remote** | https://github.com/vijhisha/olist-analytics-platform |
 
@@ -120,8 +120,24 @@ GOOGLE_APPLICATION_CREDENTIALS=C:\Users\bhand\.gcp\olist-sa-key.json
 
 **dbt datasets created:** `dev_staging`
 
-### Phase 3 — Intermediate + Dimensional Core ⏳ not started
-### Phase 3 — Intermediate + Dimensional Core ⏳ not started
+### Phase 3 — Intermediate + Dimensional Core ✅
+**Commit:** `(see below)`
+
+**Completed:**
+- `int_orders_enriched`: delivery_days, estimated_vs_actual_days, is_late derived from order timestamps
+- `int_order_items_priced`: item_total = price + freight_value
+- `dim_customers` (96,096 rows): deduped to customer_unique_id grain via qualify row_number()
+- `dim_products` (32,951 rows): English category joined from raw translation table
+- `dim_sellers` (3,095 rows): lat/lng added from stg_geolocation
+- `fct_orders` (99,441 rows): order grain with payment + item aggregates
+- `fct_order_items` (112,650 rows): **incremental (merge)** on _loaded_date; second run = MERGE (0 rows) ✓
+- `seller_status_snapshot` (3,095 rows): check strategy on is_active flag; re-run = no changes ✓
+- Full docs in _intermediate.yml and _marts.yml
+
+**dbt build: 96/96 PASS** (80 tests + 14 models + 1 snapshot + 1 incremental)
+
+**BigQuery datasets created:** `dev_intermediate`, `dev_marts`, `snapshots`
+
 ### Phase 4 — Analytics Marts ⏳ not started
 ### Phase 5 — Test Hardening + Docs ⏳ not started
 ### Phase 6 — CI ⏳ not started

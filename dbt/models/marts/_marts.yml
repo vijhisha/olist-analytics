@@ -1,0 +1,174 @@
+version: 2
+
+models:
+  # ── Dimensions ────────────────────────────────────────────────────────────────
+
+  - name: dim_customers
+    description: >
+      One row per unique customer (customer_unique_id). Deduped from the
+      order-scoped stg_customers. Use customer_unique_id — not customer_id —
+      for cohort, retention, and repeat-purchase analysis.
+      NOTE: repeat-purchase rate in this dataset is ~3 %; that is real signal.
+    columns:
+      - name: customer_unique_id
+        description: Stable person-level customer key.
+        tests:
+          - not_null
+          - unique
+      - name: zip_code_prefix
+        description: 5-digit zip prefix of the customer's address.
+      - name: customer_city
+        description: City of the customer (lowercased, trimmed).
+      - name: customer_state
+        description: Two-letter Brazilian state code.
+        tests:
+          - not_null
+
+  - name: dim_products
+    description: >
+      One row per product. Joins the Portuguese category name to its English
+      translation; falls back to the Portuguese name if no translation exists
+      (~600 products have no category at all).
+    columns:
+      - name: product_id
+        description: Unique product identifier.
+        tests:
+          - not_null
+          - unique
+      - name: product_category_name
+        description: Portuguese product category name. Null for uncategorised products.
+      - name: product_category_name_english
+        description: >
+          English translation of the category. Falls back to the Portuguese name
+          when a translation is unavailable.
+      - name: product_weight_g
+        description: Product weight in grams; used in freight-cost analysis.
+      - name: product_length_cm
+        description: Product length in centimetres.
+      - name: product_height_cm
+        description: Product height in centimetres.
+      - name: product_width_cm
+        description: Product width in centimetres.
+
+  - name: dim_sellers
+    description: >
+      One row per seller with location data and lat/lng from stg_geolocation.
+      Lat/lng is null for sellers whose zip prefix is not in the geolocation table.
+    columns:
+      - name: seller_id
+        description: Unique seller identifier.
+        tests:
+          - not_null
+          - unique
+      - name: zip_code_prefix
+        description: 5-digit zip prefix of the seller's address.
+        tests:
+          - not_null
+      - name: seller_city
+        description: City of the seller (lowercased, trimmed).
+      - name: seller_state
+        description: Two-letter Brazilian state code.
+        tests:
+          - not_null
+      - name: latitude
+        description: Average latitude for the seller's zip prefix.
+      - name: longitude
+        description: Average longitude for the seller's zip prefix.
+
+  # ── Facts ─────────────────────────────────────────────────────────────────────
+
+  - name: fct_orders
+    description: >
+      One row per order. Combines delivery metrics from int_orders_enriched with
+      payment and item aggregates. The primary fact table for GMV, delivery,
+      and customer-level analysis.
+    columns:
+      - name: order_id
+        description: Unique order identifier.
+        tests:
+          - not_null
+          - unique
+      - name: customer_id
+        description: Order-scoped customer key; join to stg_customers for customer_unique_id.
+        tests:
+          - not_null
+      - name: order_status
+        description: Current lifecycle status of the order.
+        tests:
+          - not_null
+      - name: purchased_at
+        description: Timestamp when the order was placed.
+        tests:
+          - not_null
+      - name: delivery_days
+        description: Calendar days from purchase to customer receipt. Null if not delivered.
+      - name: estimated_vs_actual_days
+        description: Days early (positive) or late (negative) vs estimated delivery date.
+      - name: is_late
+        description: True if the order was delivered past its estimated date.
+      - name: order_value
+        description: Total payment value in BRL (sum of all payment entries for the order).
+        tests:
+          - not_null
+      - name: item_count
+        description: Number of line items in the order.
+        tests:
+          - not_null
+      - name: items_value
+        description: Sum of item prices (excluding freight) in BRL.
+        tests:
+          - not_null
+      - name: total_freight
+        description: Total freight cost in BRL across all items in the order.
+        tests:
+          - not_null
+      - name: _loaded_date
+        description: Batch watermark; first day of the purchase month.
+
+  - name: fct_order_items
+    description: >
+      One row per order line item. Incremental model — merges new monthly batches
+      using _loaded_date as the watermark. Use for product- and seller-level analysis.
+    config:
+      materialized: incremental
+      unique_key:
+        - order_id
+        - order_item_id
+      incremental_strategy: merge
+    columns:
+      - name: order_id
+        description: Foreign key to fct_orders.
+        tests:
+          - not_null
+      - name: order_item_id
+        description: Sequential item number within the order (1-based).
+        tests:
+          - not_null
+      - name: product_id
+        description: Foreign key to dim_products.
+        tests:
+          - not_null
+      - name: seller_id
+        description: Foreign key to dim_sellers.
+        tests:
+          - not_null
+      - name: customer_id
+        description: Order-scoped customer key (denormalised from the order).
+        tests:
+          - not_null
+      - name: price
+        description: Item price in BRL.
+        tests:
+          - not_null
+      - name: freight_value
+        description: Freight cost in BRL for this item.
+        tests:
+          - not_null
+      - name: item_total
+        description: price + freight_value.
+        tests:
+          - not_null
+      - name: _loaded_date
+        description: Batch watermark; first day of the purchase month.
+
+  # ── Marts (added in Phase 4) ──────────────────────────────────────────────────

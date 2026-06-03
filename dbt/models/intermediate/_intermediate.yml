@@ -1,0 +1,65 @@
+version: 2
+
+models:
+  - name: int_orders_enriched
+    description: >
+      Orders with computed delivery metrics. One row per order.
+      Null values for delivery columns indicate the order has not yet been delivered.
+    columns:
+      - name: order_id
+        description: Unique order identifier.
+        tests:
+          - not_null
+          - unique
+      - name: customer_id
+        description: Order-scoped customer key; join to dim_customers via stg_customers.
+        tests:
+          - not_null
+      - name: order_status
+        description: Current lifecycle status of the order.
+        tests:
+          - not_null
+      - name: purchased_at
+        description: Timestamp when the customer placed the order.
+        tests:
+          - not_null
+      - name: delivery_days
+        description: >
+          Calendar days from purchase to customer receipt.
+          Null for orders not yet delivered.
+      - name: estimated_vs_actual_days
+        description: >
+          DATE_DIFF(estimated_delivery_date, delivered_to_customer_at, DAY).
+          Positive = delivered early; negative = delivered late; null = not yet delivered.
+      - name: is_late
+        description: >
+          True if delivered_to_customer_at > estimated_delivery_date.
+          Null for orders not yet delivered.
+      - name: _loaded_date
+        description: Batch-load watermark; first day of the purchase month.
+
+  - name: int_order_items_priced
+    description: >
+      Order items with a computed item_total (price + freight_value).
+      One row per order line item. No joins — extends stg_order_items only.
+    columns:
+      - name: order_id
+        description: Foreign key to int_orders_enriched.
+        tests:
+          - not_null
+      - name: order_item_id
+        description: Sequential item number within the order (1-based).
+        tests:
+          - not_null
+      - name: price
+        description: Item price in BRL, excluding freight.
+        tests:
+          - not_null
+      - name: freight_value
+        description: Freight cost in BRL for this item.
+        tests:
+          - not_null
+      - name: item_total
+        description: price + freight_value; the full cost of this line item to the customer.
+        tests:
+          - not_null
