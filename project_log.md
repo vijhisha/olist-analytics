@@ -10,7 +10,7 @@
 |---|---|
 | **Current phase** | Phase 1 complete — ready for Phase 2 |
 | **Next action** | Implement staging models (Phase 2) |
-| **Last commit** | `(see below)` — feat: Phase 1 ingestion |
+| **Last commit** | `c8af8ca` — feat: Phase 1 ingestion |
 | **Branch** | `master` |
 | **Remote** | https://github.com/vijhisha/olist-analytics-platform |
 
@@ -78,7 +78,7 @@ GOOGLE_APPLICATION_CREDENTIALS=C:\Users\bhand\.gcp\olist-sa-key.json
 ---
 
 ### Phase 1 — Ingestion ✅
-**Commit:** `(feat: Phase 1 ingestion)`
+**Commit:** `c8af8ca`
 
 **Completed:**
 - `ingestion/load_raw.py` — reads all 9 CSVs, loads into `olist-analytics-498115.raw`
