@@ -10,7 +10,7 @@
 |---|---|
 | **Current phase** | Phase 6 complete — ready for Phase 7 |
 | **Next action** | Causal analysis notebook + A/B test design (Phase 7) |
-| **Last commit** | `(see below)` — feat: Phase 6 CI |
+| **Last commit** | `72de1ae` — feat: Phase 6 CI |
 | **Branch** | `master` |
 | **Remote** | https://github.com/vijhisha/olist-analytics-platform |
 
@@ -186,7 +186,7 @@ Run as two steps: `dbt build --exclude resource_type:snapshot` then `dbt snapsho
 | Exposures | 1 |
 | dbt build result | 142/142 PASS |
 ### Phase 6 — CI ✅
-**Commit:** `(see below)`
+**Commit:** `72de1ae`
 
 **Completed:**
 - `.github/workflows/ci.yml` — triggers on pull_request to master/main
