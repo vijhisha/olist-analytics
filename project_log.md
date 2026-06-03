@@ -10,7 +10,7 @@
 |---|---|
 | **Current phase** | Phase 5 complete — ready for Phase 6 |
 | **Next action** | GitHub Actions CI (Phase 6) |
-| **Last commit** | `(see below)` — feat: Phase 5 test hardening + docs |
+| **Last commit** | `04064e1` — feat: Phase 5 test hardening + docs |
 | **Branch** | `master` |
 | **Remote** | https://github.com/vijhisha/olist-analytics-platform |
 
@@ -161,7 +161,7 @@ Run as two steps: `dbt build --exclude resource_type:snapshot` then `dbt snapsho
 119/119 models+tests PASS; snapshot PASS when run standalone.
 
 ### Phase 5 — Test Hardening + Docs ✅
-**Commit:** `(see below)`
+**Commit:** `04064e1`
 
 **Completed:**
 - Singular test: `tests/assert_delivery_after_purchase.sql` — delivered date never before purchase date
