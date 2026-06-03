@@ -8,9 +8,9 @@
 
 | Field | Value |
 |---|---|
-| **Current phase** | Phase 1 complete — ready for Phase 2 |
-| **Next action** | Implement staging models (Phase 2) |
-| **Last commit** | `c8af8ca` — feat: Phase 1 ingestion |
+| **Current phase** | Phase 2 complete — ready for Phase 3 |
+| **Next action** | Implement intermediate + dimensional models (Phase 3) |
+| **Last commit** | `(see below)` — feat: Phase 2 staging |
 | **Branch** | `master` |
 | **Remote** | https://github.com/vijhisha/olist-analytics-platform |
 
@@ -102,7 +102,25 @@ GOOGLE_APPLICATION_CREDENTIALS=C:\Users\bhand\.gcp\olist-sa-key.json
 
 ---
 
-### Phase 2 — Staging ⏳ not started
+### Phase 2 — Staging ✅
+**Commit:** `(see below)`
+
+**Completed:**
+- 8 staging views in `dev_staging` dataset (BigQuery)
+- `_sources.yml` — all 9 raw tables declared with descriptions; freshness on raw_orders (`_loaded_date`), raw_order_items (`shipping_limit_date`), raw_order_reviews (`review_answer_timestamp`)
+- `_staging.yml` — full column descriptions + tests for all 8 models
+- All casts: price/freight/payment_value → FLOAT64, order_item_id/review_score/installments → INT64
+- `stg_geolocation`: deduped 1 000 163 rows → 19 015 unique zip prefixes via AVG lat/lng + ANY_VALUE city/state
+- `stg_order_reviews`: deduped 789 duplicate review_ids (known source data issue) via `qualify row_number()`
+- `stg_products`: fixed two source typos (`product_name_lenght` → `product_name_length`, etc.)
+- `stg_customers` / `stg_sellers`: city lowercased + trimmed
+
+**Tests: 52/52 passed**
+- 20 not_null, 7 unique, 6 relationships, 2 accepted_values (order_status, payment_type), 1 accepted_values (review_score, quote:false)
+
+**dbt datasets created:** `dev_staging`
+
+### Phase 3 — Intermediate + Dimensional Core ⏳ not started
 ### Phase 3 — Intermediate + Dimensional Core ⏳ not started
 ### Phase 4 — Analytics Marts ⏳ not started
 ### Phase 5 — Test Hardening + Docs ⏳ not started

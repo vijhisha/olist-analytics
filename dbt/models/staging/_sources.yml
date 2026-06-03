@@ -1,0 +1,61 @@
+version: 2
+
+sources:
+  - name: raw
+    description: >
+      Raw tables loaded directly from Olist CSV files via ingestion/load_raw.py.
+      All columns are STRING except timestamp columns and _loaded_date (DATETIME).
+      Re-running load_raw.py is safe (WRITE_TRUNCATE for all tables).
+    database: "{{ env_var('DBT_BQ_PROJECT') }}"
+    schema: raw
+
+    tables:
+      - name: raw_orders
+        description: >
+          One row per order. Loaded month-by-month (25 batches) with a
+          _loaded_date watermark column for incremental dbt models.
+          NOTE: freshness will always warn on this historical dataset (2016-2018).
+        loaded_at_field: _loaded_date
+        freshness:
+          warn_after: {count: 7, period: day}
+          error_after: {count: 14, period: day}
+
+      - name: raw_order_items
+        description: One row per line item per order. Contains price and freight.
+        loaded_at_field: shipping_limit_date
+        freshness:
+          warn_after: {count: 30, period: day}
+          error_after: {count: 90, period: day}
+
+      - name: raw_order_payments
+        description: One row per payment entry; an order may have multiple payment types.
+
+      - name: raw_order_reviews
+        description: One row per customer review; linked to an order.
+        loaded_at_field: review_answer_timestamp
+        freshness:
+          warn_after: {count: 7, period: day}
+          error_after: {count: 14, period: day}
+
+      - name: raw_customers
+        description: >
+          One row per customer_id (order-scoped). customer_unique_id is the true
+          person identifier; the same person may have multiple customer_id values.
+
+      - name: raw_products
+        description: >
+          One row per product. Dimension columns include physical measurements
+          and category name (Portuguese). Two column names have typos in the
+          source (product_name_lenght, product_description_lenght) — corrected
+          in staging.
+
+      - name: raw_sellers
+        description: One row per seller. Contains zip code, city, and state.
+
+      - name: raw_geolocation
+        description: >
+          Zip-code-prefix to lat/lng lookup. Contains ~1 M rows across ~19 k
+          unique prefixes — deduped to one row per prefix in stg_geolocation.
+
+      - name: raw_product_category_name_translation
+        description: Maps Portuguese product category names to English equivalents.
