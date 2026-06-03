@@ -10,7 +10,7 @@
 |---|---|
 | **Current phase** | Phase 3 complete — ready for Phase 4 |
 | **Next action** | Implement analytics marts (Phase 4) |
-| **Last commit** | `(see below)` — feat: Phase 3 intermediate + dimensional core |
+| **Last commit** | `7644898` — feat: Phase 3 intermediate + dimensional core |
 | **Branch** | `master` |
 | **Remote** | https://github.com/vijhisha/olist-analytics-platform |
 
@@ -121,7 +121,7 @@ GOOGLE_APPLICATION_CREDENTIALS=C:\Users\bhand\.gcp\olist-sa-key.json
 **dbt datasets created:** `dev_staging`
 
 ### Phase 3 — Intermediate + Dimensional Core ✅
-**Commit:** `(see below)`
+**Commit:** `7644898`
 
 **Completed:**
 - `int_orders_enriched`: delivery_days, estimated_vs_actual_days, is_late derived from order timestamps
