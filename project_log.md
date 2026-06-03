@@ -10,7 +10,7 @@
 |---|---|
 | **Current phase** | Phase 7 complete — ready for Phase 8 |
 | **Next action** | README polish + portfolio wrap-up (Phase 8) |
-| **Last commit** | `(see below)` — feat: Phase 7 analysis + A/B design |
+| **Last commit** | `7c518ca` — feat: Phase 7 analysis + A/B design |
 | **Branch** | `master` |
 | **Remote** | https://github.com/vijhisha/olist-analytics-platform |
 
@@ -207,7 +207,7 @@ Run as two steps: `dbt build --exclude resource_type:snapshot` then `dbt snapsho
 **YAML validation:** passed (`yaml.safe_load` ✓)
 
 ### Phase 7 — Analysis + Experiment Design ✅
-**Commit:** `(see below)`
+**Commit:** `7c518ca`
 
 **Completed:**
 - `analysis/delivery_review_causal.ipynb` — 13-cell notebook, runs top to bottom
