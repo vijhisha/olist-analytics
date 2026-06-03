@@ -8,9 +8,9 @@
 
 | Field | Value |
 |---|---|
-| **Current phase** | Phase 0 complete — ready for Phase 1 |
-| **Next action** | Implement `ingestion/load_raw.py` (Phase 1) |
-| **Last commit** | `532cc68` — chore: run dbt deps and fix deprecated package names |
+| **Current phase** | Phase 1 complete — ready for Phase 2 |
+| **Next action** | Implement staging models (Phase 2) |
+| **Last commit** | `(see below)` — feat: Phase 1 ingestion |
 | **Branch** | `master` |
 | **Remote** | https://github.com/vijhisha/olist-analytics-platform |
 
@@ -77,11 +77,28 @@ GOOGLE_APPLICATION_CREDENTIALS=C:\Users\bhand\.gcp\olist-sa-key.json
 
 ---
 
-### Phase 1 — Ingestion ⏳ not started
-- `ingestion/load_raw.py`: reads all 9 CSVs → BigQuery `raw` dataset as `raw_<table>`
-- Simulate batch loads by partitioning orders on `order_purchase_timestamp`
-- Idempotent; log per-table row counts
-- **Acceptance:** 9 raw tables in BQ, orders ≈ 99k, order_items ≈ 112k; re-run safe
+### Phase 1 — Ingestion ✅
+**Commit:** `(feat: Phase 1 ingestion)`
+
+**Completed:**
+- `ingestion/load_raw.py` — reads all 9 CSVs, loads into `olist-analytics-498115.raw`
+- Orders loaded month-by-month (25 batches, 2016-09 → 2018-10), `_loaded_date` column added
+- All other tables use WRITE_TRUNCATE (full-replace, idempotent)
+- Timestamp columns coerced: orders (5 cols), order_items (1 col), order_reviews (2 cols)
+- BOM stripped from product_category_name_translation headers
+
+**Row counts (verified idempotent on two runs):**
+| Table | Rows |
+|---|---|
+| raw_customers | 99,441 |
+| raw_geolocation | 1,000,163 |
+| raw_order_items | 112,650 |
+| raw_order_payments | 103,886 |
+| raw_order_reviews | 99,224 |
+| raw_orders | 99,441 |
+| raw_products | 32,951 |
+| raw_sellers | 3,095 |
+| raw_product_category_name_translation | 71 |
 
 ---
 
