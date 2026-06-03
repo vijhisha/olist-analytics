@@ -8,9 +8,9 @@
 
 | Field | Value |
 |---|---|
-| **Current phase** | Phase 3 complete — ready for Phase 4 |
-| **Next action** | Implement analytics marts (Phase 4) |
-| **Last commit** | `7644898` — feat: Phase 3 intermediate + dimensional core |
+| **Current phase** | Phase 4 complete — ready for Phase 5 |
+| **Next action** | Test hardening + dbt docs (Phase 5) |
+| **Last commit** | `(see below)` — feat: Phase 4 analytics marts |
 | **Branch** | `master` |
 | **Remote** | https://github.com/vijhisha/olist-analytics-platform |
 
@@ -138,7 +138,29 @@ GOOGLE_APPLICATION_CREDENTIALS=C:\Users\bhand\.gcp\olist-sa-key.json
 
 **BigQuery datasets created:** `dev_intermediate`, `dev_marts`, `snapshots`
 
-### Phase 4 — Analytics Marts ⏳ not started
+### Phase 4 — Analytics Marts ✅
+**Commit:** `(see below)`
+
+**Completed:**
+- `mart_gmv_daily` (18,900 rows): grain (order_date, product_category). Includes category_gmv_share and daily_aov computed via window functions.
+- `mart_delivery_performance` (556 rows): grain (order_month, customer_state). Delivered orders only.
+- `mart_customer_cohorts` (220 rows): grain (cohort_month, order_month). Classic retention table.
+- `_marts.yml` fully extended with all metric definitions.
+
+**Spot-check values (for resume/README):**
+| Metric | Value |
+|---|---|
+| Total GMV (2016-2018) | R$ 15,739,137 |
+| Overall late-delivery rate | 8.1% |
+| Repeat-purchase rate | ~2% (dataset-level) |
+| Top category by GMV | health_beauty (R$1.44M) |
+| Highest late-delivery state | AL (Alagoas) — 23.9% |
+
+**Known quirk:** `dbt build` with 4 threads sporadically times out the snapshot due to BigQuery concurrency.
+Run as two steps: `dbt build --exclude resource_type:snapshot` then `dbt snapshot`.
+119/119 models+tests PASS; snapshot PASS when run standalone.
+
+### Phase 5 — Test Hardening + Docs ⏳ not started
 ### Phase 5 — Test Hardening + Docs ⏳ not started
 ### Phase 6 — CI ⏳ not started
 ### Phase 7 — Analysis + Experiment Design ⏳ not started

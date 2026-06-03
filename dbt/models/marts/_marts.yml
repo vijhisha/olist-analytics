@@ -171,4 +171,129 @@ models:
       - name: _loaded_date
         description: Batch watermark; first day of the purchase month.
 
-  # ── Marts (added in Phase 4) ──────────────────────────────────────────────────
+  # ── Marts ─────────────────────────────────────────────────────────────────────
+
+  - name: mart_gmv_daily
+    description: >
+      Grain: (order_date, product_category_name_english). One row per category
+      per day for non-canceled orders. daily_gmv / daily_order_count / daily_aov
+      are repeated on every category row so a BI tool can compute category share
+      (category_gmv / daily_gmv) without a self-join.
+      Excludes 'canceled' and 'unavailable' orders.
+    columns:
+      - name: order_date
+        description: Calendar date of purchase (truncated from purchased_at).
+        tests:
+          - not_null
+      - name: product_category
+        description: >
+          English product category. 'uncategorized' where the category is null.
+        tests:
+          - not_null
+      - name: order_count
+        description: >
+          Distinct orders containing at least one item in this category on this day.
+          Note: an order spanning multiple categories is counted once per category.
+        tests:
+          - not_null
+      - name: item_count
+        description: Number of individual line items in this category on this day.
+        tests:
+          - not_null
+      - name: category_gmv
+        description: Sum of item_total (price + freight) for this category and day in BRL.
+        tests:
+          - not_null
+      - name: daily_order_count
+        description: Total distinct orders on this day (all categories, from fct_orders).
+        tests:
+          - not_null
+      - name: daily_gmv
+        description: >
+          Total GMV on this day in BRL, computed from actual payment amounts (order_value).
+          Use this as the headline GMV figure — it differs slightly from sum(category_gmv)
+          because category_gmv uses item_total while daily_gmv uses payment totals.
+        tests:
+          - not_null
+      - name: daily_aov
+        description: daily_gmv / daily_order_count — average order value for the day in BRL.
+        tests:
+          - not_null
+      - name: category_gmv_share
+        description: category_gmv / sum(category_gmv for the day) — this category's share of daily item GMV.
+        tests:
+          - not_null
+
+  - name: mart_delivery_performance
+    description: >
+      Grain: (order_month, customer_state). Delivery KPIs for completed
+      (status = 'delivered') orders only, grouped by the customer's Brazilian
+      state and the month of purchase. Orders without a recorded delivery date
+      are excluded so rates are not diluted by in-transit or canceled orders.
+    columns:
+      - name: order_month
+        description: First day of the purchase month (DATE).
+        tests:
+          - not_null
+      - name: customer_state
+        description: Two-letter Brazilian state code of the customer.
+        tests:
+          - not_null
+      - name: delivered_orders
+        description: Count of delivered orders in this state-month.
+        tests:
+          - not_null
+      - name: late_orders
+        description: Orders where delivered_to_customer_at > estimated_delivery_date.
+        tests:
+          - not_null
+      - name: late_delivery_rate
+        description: late_orders / delivered_orders. Range 0–1.
+        tests:
+          - not_null
+      - name: avg_delivery_days
+        description: Average calendar days from purchase to customer receipt.
+        tests:
+          - not_null
+      - name: avg_days_early
+        description: >
+          Average of estimated_vs_actual_days. Positive = delivered early on average;
+          negative = delivered late on average.
+        tests:
+          - not_null
+
+  - name: mart_customer_cohorts
+    description: >
+      Grain: (cohort_month, order_month). Classic monthly acquisition-cohort
+      retention table. cohort_month is the customer's first purchase month;
+      order_month is any subsequent month with a purchase.
+      periods_since_acquisition = 0 is the acquisition month (retention = 100 %).
+      Repeat-purchase rate in this dataset is ~3 %: most rows at period > 0
+      will show very low active_customers — this is expected signal, not a bug.
+      Excludes canceled and unavailable orders.
+    columns:
+      - name: cohort_month
+        description: First day of the month in which the customer first purchased (DATE).
+        tests:
+          - not_null
+      - name: order_month
+        description: First day of the month in which the cohort customers purchased again.
+        tests:
+          - not_null
+      - name: periods_since_acquisition
+        description: >
+          Months between cohort_month and order_month. 0 = acquisition month.
+          Use this as the x-axis on a cohort retention chart.
+        tests:
+          - not_null
+      - name: cohort_size
+        description: Total distinct customers acquired in cohort_month.
+        tests:
+          - not_null
+      - name: active_customers
+        description: >
+          Customers from this cohort who placed at least one order in order_month.
+        tests:
+          - not_null
+      - name: retention_rate
+        description: active_customers / cohort_size. Range 0–1.
