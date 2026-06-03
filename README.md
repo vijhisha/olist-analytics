@@ -112,13 +112,50 @@ dbt build
 
 ## CI / GitHub Actions
 
-CI runs on every pull request. It requires two repository secrets/variables — see [Phase 6 setup](#ci-setup) for instructions.
+CI runs on every pull request via `.github/workflows/ci.yml`. The pipeline:
+
+1. **SQLFluff lint** — checks all SQL in `dbt/models/` against the BigQuery dialect
+2. **`dbt build --target ci`** — runs all models and tests against a dedicated `ci` BigQuery dataset
+3. **`dbt source freshness`** — checks source staleness (runs but doesn't fail CI; see note below)
+
+> **Note on source freshness:** The Olist dataset is historical (2016–2018), so freshness checks always report stale data. The step is set to `continue-on-error: true` intentionally — it demonstrates the pattern without breaking CI on known-static data. A live pipeline would remove that flag.
 
 ---
 
 ## CI Setup
 
-_To be documented in Phase 6._
+**This is a one-time human step — do this before opening your first PR.**
+
+### 1. Add the `GCP_SA_KEY` repository secret
+
+This is the full contents of your service-account JSON key file.
+
+1. Go to your GitHub repo → **Settings** → **Secrets and variables** → **Actions**
+2. Click **New repository secret**
+3. Name: `GCP_SA_KEY`
+4. Value: paste the entire contents of `olist-sa-key.json` (the JSON object, starting with `{`)
+5. Click **Add secret**
+
+### 2. Add the `DBT_BQ_PROJECT` repository variable
+
+1. On the same page, click the **Variables** tab
+2. Click **New repository variable**
+3. Name: `DBT_BQ_PROJECT`
+4. Value: `olist-analytics-498115`
+5. Click **Add variable**
+
+### 3. Verify the service-account permissions
+
+The service account needs these BigQuery IAM roles on the project:
+
+| Role | Purpose |
+|---|---|
+| `BigQuery Data Editor` | Create/write to datasets and tables |
+| `BigQuery Job User` | Submit query jobs |
+
+### 4. First CI run
+
+Push a branch and open a pull request. The `dbt-ci` job will appear under **Checks**. On the first run, dbt will automatically create the `ci_staging`, `ci_intermediate`, and `ci_marts` datasets in BigQuery.
 
 ---
 

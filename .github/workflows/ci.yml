@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [master, main]
+
+# Credentials and dbt target are set once here and inherited by all steps.
+env:
+  GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp-sa-key.json
+  DBT_BQ_PROJECT: ${{ vars.DBT_BQ_PROJECT }}
+  DBT_BQ_DATASET: ci
+
+jobs:
+  dbt-ci:
+    name: lint → build → freshness
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # Write the service-account JSON key passed in as a repo secret.
+      # Passing via env var (not inline interpolation) avoids shell-quoting issues.
+      - name: Write GCP service-account key
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+        run: echo "$GCP_SA_KEY" > "$GOOGLE_APPLICATION_CREDENTIALS"
+
+      # profiles.example.yml reads every sensitive value from env vars,
+      # so copying it directly gives a working profile in CI.
+      - name: Configure dbt profile
+        run: |
+          mkdir -p ~/.dbt
+          cp dbt/profiles.example.yml ~/.dbt/profiles.yml
+
+      - name: dbt deps
+        working-directory: dbt
+        run: dbt deps
+
+      # sqlfluff uses the dbt templater (see .sqlfluff) which compiles models
+      # against BigQuery — credentials are already set in env above.
+      - name: SQLFluff lint
+        working-directory: dbt
+        run: sqlfluff lint models --processes 2
+
+      # Snapshots are excluded because dbt build with 4 threads occasionally
+      # causes a BigQuery concurrency timeout on the snapshot MERGE.
+      # Run snapshots as a separate scheduled job instead.
+      - name: dbt build — CI target
+        working-directory: dbt
+        run: dbt build --target ci --exclude resource_type:snapshot
+        timeout-minutes: 20
+
+      # The Olist dataset is historical (2016–2018) so source freshness will
+      # always report stale data. continue-on-error keeps CI green while still
+      # running the check. Remove this flag for a live production pipeline.
+      - name: dbt source freshness
+        working-directory: dbt
+        run: dbt source freshness --target ci
+        continue-on-error: true

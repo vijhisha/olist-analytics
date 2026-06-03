@@ -8,9 +8,9 @@
 
 | Field | Value |
 |---|---|
-| **Current phase** | Phase 5 complete — ready for Phase 6 |
-| **Next action** | GitHub Actions CI (Phase 6) |
-| **Last commit** | `04064e1` — feat: Phase 5 test hardening + docs |
+| **Current phase** | Phase 6 complete — ready for Phase 7 |
+| **Next action** | Causal analysis notebook + A/B test design (Phase 7) |
+| **Last commit** | `(see below)` — feat: Phase 6 CI |
 | **Branch** | `master` |
 | **Remote** | https://github.com/vijhisha/olist-analytics-platform |
 
@@ -185,6 +185,27 @@ Run as two steps: `dbt build --exclude resource_type:snapshot` then `dbt snapsho
 | Sources | 9 |
 | Exposures | 1 |
 | dbt build result | 142/142 PASS |
-### Phase 6 — CI ⏳ not started
+### Phase 6 — CI ✅
+**Commit:** `(see below)`
+
+**Completed:**
+- `.github/workflows/ci.yml` — triggers on pull_request to master/main
+  - Step 1: SQLFluff lint (`models/`, dbt templater, 2 processes)
+  - Step 2: `dbt build --target ci --exclude resource_type:snapshot`
+  - Step 3: `dbt source freshness --target ci` (continue-on-error for historical data)
+- README CI Setup section — copy-pasteable instructions for:
+  - `GCP_SA_KEY` repository secret (full SA JSON)
+  - `DBT_BQ_PROJECT` repository variable
+  - Required IAM roles (BigQuery Data Editor + Job User)
+  - Note: `ci_staging`, `ci_intermediate`, `ci_marts` datasets auto-created by dbt on first run
+
+**Human step required before first CI run:**
+  1. Add `GCP_SA_KEY` secret (full SA JSON) → GitHub repo Settings → Secrets
+  2. Add `DBT_BQ_PROJECT` variable = `olist-analytics-498115` → GitHub repo Settings → Variables
+  3. Open a PR to trigger the workflow
+
+**YAML validation:** passed (`yaml.safe_load` ✓)
+
+### Phase 7 — Analysis + Experiment Design ⏳ not started
 ### Phase 7 — Analysis + Experiment Design ⏳ not started
 ### Phase 8 — README + Portfolio Polish ⏳ not started
