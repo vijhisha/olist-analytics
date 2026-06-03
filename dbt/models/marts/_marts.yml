@@ -82,6 +82,14 @@ models:
       One row per order. Combines delivery metrics from int_orders_enriched with
       payment and item aggregates. The primary fact table for GMV, delivery,
       and customer-level analysis.
+    tests:
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 90000
+          max_value: 110000
+      - dbt_utils.expression_is_true:
+          expression: "order_value >= 0"
+      - dbt_utils.expression_is_true:
+          expression: "item_count >= 0"
     columns:
       - name: order_id
         description: Unique order identifier.
@@ -129,6 +137,14 @@ models:
     description: >
       One row per order line item. Incremental model — merges new monthly batches
       using _loaded_date as the watermark. Use for product- and seller-level analysis.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [order_id, order_item_id]
+      - dbt_utils.expression_is_true:
+          expression: "abs(item_total - (price + freight_value)) < 0.01"
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 100000
+          max_value: 125000
     config:
       materialized: incremental
       unique_key:
@@ -180,6 +196,9 @@ models:
       are repeated on every category row so a BI tool can compute category share
       (category_gmv / daily_gmv) without a self-join.
       Excludes 'canceled' and 'unavailable' orders.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [order_date, product_category]
     columns:
       - name: order_date
         description: Calendar date of purchase (truncated from purchased_at).
@@ -223,6 +242,10 @@ models:
         description: category_gmv / sum(category_gmv for the day) — this category's share of daily item GMV.
         tests:
           - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 1
+              inclusive: true
 
   - name: mart_delivery_performance
     description: >
@@ -230,6 +253,9 @@ models:
       (status = 'delivered') orders only, grouped by the customer's Brazilian
       state and the month of purchase. Orders without a recorded delivery date
       are excluded so rates are not diluted by in-transit or canceled orders.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [order_month, customer_state]
     columns:
       - name: order_month
         description: First day of the purchase month (DATE).
@@ -251,6 +277,10 @@ models:
         description: late_orders / delivered_orders. Range 0–1.
         tests:
           - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 1
+              inclusive: true
       - name: avg_delivery_days
         description: Average calendar days from purchase to customer receipt.
         tests:
@@ -271,6 +301,9 @@ models:
       Repeat-purchase rate in this dataset is ~3 %: most rows at period > 0
       will show very low active_customers — this is expected signal, not a bug.
       Excludes canceled and unavailable orders.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [cohort_month, order_month]
     columns:
       - name: cohort_month
         description: First day of the month in which the customer first purchased (DATE).
@@ -297,3 +330,8 @@ models:
           - not_null
       - name: retention_rate
         description: active_customers / cohort_size. Range 0–1.
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 1
+              inclusive: true

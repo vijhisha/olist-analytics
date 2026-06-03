@@ -8,9 +8,9 @@
 
 | Field | Value |
 |---|---|
-| **Current phase** | Phase 4 complete — ready for Phase 5 |
-| **Next action** | Test hardening + dbt docs (Phase 5) |
-| **Last commit** | `a1c81a5` — feat: Phase 4 analytics marts |
+| **Current phase** | Phase 5 complete — ready for Phase 6 |
+| **Next action** | GitHub Actions CI (Phase 6) |
+| **Last commit** | `(see below)` — feat: Phase 5 test hardening + docs |
 | **Branch** | `master` |
 | **Remote** | https://github.com/vijhisha/olist-analytics-platform |
 
@@ -160,8 +160,31 @@ GOOGLE_APPLICATION_CREDENTIALS=C:\Users\bhand\.gcp\olist-sa-key.json
 Run as two steps: `dbt build --exclude resource_type:snapshot` then `dbt snapshot`.
 119/119 models+tests PASS; snapshot PASS when run standalone.
 
-### Phase 5 — Test Hardening + Docs ⏳ not started
-### Phase 5 — Test Hardening + Docs ⏳ not started
+### Phase 5 — Test Hardening + Docs ✅
+**Commit:** `(see below)`
+
+**Completed:**
+- Singular test: `tests/assert_delivery_after_purchase.sql` — delivered date never before purchase date
+- Exposure: `models/_exposures.yml` — Looker Studio dashboard with URL placeholder
+- New tests added across all layers:
+  - `dbt_utils.unique_combination_of_columns`: stg_order_items, stg_order_payments, fct_order_items, mart_gmv_daily, mart_delivery_performance, mart_customer_cohorts
+  - `dbt_utils.accepted_range`: price ≥0, freight ≥0, payment_value ≥0, late_delivery_rate 0-1, retention_rate 0-1, category_gmv_share 0-1
+  - `dbt_utils.expression_is_true`: delivery_days ≥ 0, item_total = price + freight (×2), order_value ≥ 0, item_count ≥ 0
+  - `dbt_expectations.expect_column_values_to_be_between`: review_score 1-5
+  - `dbt_expectations.expect_column_mean_to_be_between`: review_score 3.5-4.5
+  - `dbt_expectations.expect_table_row_count_to_be_between`: stg_geolocation, fct_orders, fct_order_items
+- Documented known dirty GPS data in stg_geolocation (~8-9 rows with invalid coordinates)
+- `dbt docs generate` → catalog.json written successfully
+
+**Final counts (resume numbers):**
+| Metric | Count |
+|---|---|
+| Models | 18 |
+| Data tests | 124 |
+| Snapshot | 1 |
+| Sources | 9 |
+| Exposures | 1 |
+| dbt build result | 142/142 PASS |
 ### Phase 6 — CI ⏳ not started
 ### Phase 7 — Analysis + Experiment Design ⏳ not started
 ### Phase 8 — README + Portfolio Polish ⏳ not started

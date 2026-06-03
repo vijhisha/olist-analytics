@@ -5,6 +5,9 @@ models:
     description: >
       Orders with computed delivery metrics. One row per order.
       Null values for delivery columns indicate the order has not yet been delivered.
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "delivery_days is null or delivery_days >= 0"
     columns:
       - name: order_id
         description: Unique order identifier.
@@ -42,6 +45,9 @@ models:
     description: >
       Order items with a computed item_total (price + freight_value).
       One row per order line item. No joins — extends stg_order_items only.
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "abs(item_total - (price + freight_value)) < 0.01"
     columns:
       - name: order_id
         description: Foreign key to int_orders_enriched.

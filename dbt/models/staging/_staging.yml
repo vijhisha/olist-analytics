@@ -59,6 +59,9 @@ models:
     description: >
       One row per line item per order. An order may contain multiple items,
       each with its own seller, product, price, and freight.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [order_id, order_item_id]
     columns:
       - name: order_id
         description: Foreign key to stg_orders.
@@ -91,15 +94,24 @@ models:
         description: Item price in BRL, excluding freight.
         tests:
           - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
       - name: freight_value
         description: Freight cost in BRL for this item.
         tests:
           - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
 
   - name: stg_order_payments
     description: >
       One row per payment entry. A single order may be split across multiple
       payment types (e.g. credit card + voucher), giving multiple rows per order.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [order_id, payment_sequential]
     columns:
       - name: order_id
         description: Foreign key to stg_orders.
@@ -129,6 +141,9 @@ models:
         description: Value of this payment entry in BRL.
         tests:
           - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
 
   - name: stg_order_reviews
     description: >
@@ -154,6 +169,12 @@ models:
           - accepted_values:
               values: [1, 2, 3, 4, 5]
               quote: false
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1
+              max_value: 5
+          - dbt_expectations.expect_column_mean_to_be_between:
+              min_value: 3.5
+              max_value: 4.5
       - name: review_comment_title
         description: Optional short title left by the customer. Null if not provided.
       - name: review_comment_message
@@ -242,6 +263,13 @@ models:
     description: >
       One row per zip code prefix (deduped from ~1 M source rows).
       Latitude and longitude are averaged across all entries for the prefix.
+      NOTE: the source data contains ~8-9 rows with invalid GPS coordinates
+      (lat up to 42°, lng up to 121°) — a known data quality issue in the
+      Olist dataset that is out of scope to fix at the staging layer.
+    tests:
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 15000
+          max_value: 22000
     columns:
       - name: zip_code_prefix
         description: 5-digit Brazilian zip code prefix.
@@ -249,11 +277,17 @@ models:
           - not_null
           - unique
       - name: latitude
-        description: Average latitude for this zip code prefix.
+        description: >
+          Average latitude for this zip code prefix.
+          A small number of rows have invalid values outside Brazil's range
+          due to dirty source data.
         tests:
           - not_null
       - name: longitude
-        description: Average longitude for this zip code prefix.
+        description: >
+          Average longitude for this zip code prefix.
+          A small number of rows have invalid values outside Brazil's range
+          due to dirty source data.
         tests:
           - not_null
       - name: city

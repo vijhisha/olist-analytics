@@ -1,0 +1,23 @@
+version: 2
+
+exposures:
+  - name: olist_analytics_dashboard
+    label: Olist Analytics Dashboard
+    type: dashboard
+    maturity: medium
+    url: https://lookerstudio.google.com/reporting/PLACEHOLDER
+    description: >
+      Looker Studio dashboard covering GMV trends, delivery performance,
+      and monthly customer cohort retention for the Olist marketplace.
+      Built on top of the dbt marts layer.
+    depends_on:
+      - ref('mart_gmv_daily')
+      - ref('mart_delivery_performance')
+      - ref('mart_customer_cohorts')
+      - ref('fct_orders')
+      - ref('dim_customers')
+      - ref('dim_products')
+      - ref('dim_sellers')
+    owner:
+      name: vijhisha
+      email: placeholder@example.com
