@@ -8,9 +8,9 @@
 
 | Field | Value |
 |---|---|
-| **Current phase** | Phase 6 complete — ready for Phase 7 |
-| **Next action** | Causal analysis notebook + A/B test design (Phase 7) |
-| **Last commit** | `72de1ae` — feat: Phase 6 CI |
+| **Current phase** | Phase 7 complete — ready for Phase 8 |
+| **Next action** | README polish + portfolio wrap-up (Phase 8) |
+| **Last commit** | `(see below)` — feat: Phase 7 analysis + A/B design |
 | **Branch** | `master` |
 | **Remote** | https://github.com/vijhisha/olist-analytics-platform |
 
@@ -206,6 +206,25 @@ Run as two steps: `dbt build --exclude resource_type:snapshot` then `dbt snapsho
 
 **YAML validation:** passed (`yaml.safe_load` ✓)
 
-### Phase 7 — Analysis + Experiment Design ⏳ not started
-### Phase 7 — Analysis + Experiment Design ⏳ not started
+### Phase 7 — Analysis + Experiment Design ✅
+**Commit:** `(see below)`
+
+**Completed:**
+- `analysis/delivery_review_causal.ipynb` — 13-cell notebook, runs top to bottom
+  - Data: 95,604 delivered orders with reviews from BigQuery
+  - 3 figures saved to `analysis/figures/`
+  - OLS: is_late coef = **−1.18 stars** (p<0.001); delivery_days = **−0.028/day** (p<0.001); R²=0.176
+  - Logit AME: is_late = **−18.7 pp** on P(satisfied); delivery_days = **−0.77 pp/day** (both p<0.001)
+  - Explicit DAG, backdoor path (seller quality), causal assumptions discussion
+- `analysis/ab_test_design.md` — full experiment design
+  - MDE: +2 pp satisfaction (77%→79%); n≈5,300/arm; duration ≥4 weeks; ITT analysis
+
+**Key findings (resume-ready):**
+| Metric | Value |
+|---|---|
+| Late-delivery rate | 8.0% |
+| OLS is_late effect (controlled) | −1.18 stars *** |
+| Logit AME of is_late | −18.7 pp on P(satisfied) *** |
+| A/B test sample needed | ~10,600 orders (~4 weeks) |
+
 ### Phase 8 — README + Portfolio Polish ⏳ not started
