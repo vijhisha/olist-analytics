@@ -10,7 +10,7 @@
 |---|---|
 | **Current phase** | Phase 2 complete — ready for Phase 3 |
 | **Next action** | Implement intermediate + dimensional models (Phase 3) |
-| **Last commit** | `(see below)` — feat: Phase 2 staging |
+| **Last commit** | `81166b4` — feat: Phase 2 staging |
 | **Branch** | `master` |
 | **Remote** | https://github.com/vijhisha/olist-analytics-platform |
 
@@ -103,7 +103,7 @@ GOOGLE_APPLICATION_CREDENTIALS=C:\Users\bhand\.gcp\olist-sa-key.json
 ---
 
 ### Phase 2 — Staging ✅
-**Commit:** `(see below)`
+**Commit:** `81166b4`
 
 **Completed:**
 - 8 staging views in `dev_staging` dataset (BigQuery)
