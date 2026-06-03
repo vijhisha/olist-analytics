@@ -10,7 +10,7 @@
 |---|---|
 | **Current phase** | Phase 4 complete — ready for Phase 5 |
 | **Next action** | Test hardening + dbt docs (Phase 5) |
-| **Last commit** | `(see below)` — feat: Phase 4 analytics marts |
+| **Last commit** | `a1c81a5` — feat: Phase 4 analytics marts |
 | **Branch** | `master` |
 | **Remote** | https://github.com/vijhisha/olist-analytics-platform |
 
@@ -139,7 +139,7 @@ GOOGLE_APPLICATION_CREDENTIALS=C:\Users\bhand\.gcp\olist-sa-key.json
 **BigQuery datasets created:** `dev_intermediate`, `dev_marts`, `snapshots`
 
 ### Phase 4 — Analytics Marts ✅
-**Commit:** `(see below)`
+**Commit:** `a1c81a5`
 
 **Completed:**
 - `mart_gmv_daily` (18,900 rows): grain (order_date, product_category). Includes category_gmv_share and daily_aov computed via window functions.
