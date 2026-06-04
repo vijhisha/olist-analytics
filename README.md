@@ -114,8 +114,8 @@ Analysis notebook                ← analysis/delivery_review_causal.ipynb
 ### 1. Clone and create virtual environment
 
 ```bash
-git clone https://github.com/vijhisha/olist-analytics-platform.git
-cd olist-analytics-platform
+git clone https://github.com/vijhisha/olist-analytics.git
+cd olist-analytics
 
 # Linux / macOS
 python3.12 -m venv .venv && source .venv/bin/activate
