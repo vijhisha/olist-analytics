@@ -8,9 +8,9 @@
 
 | Field | Value |
 |---|---|
-| **Current phase** | Phase 7 complete — ready for Phase 8 |
-| **Next action** | README polish + portfolio wrap-up (Phase 8) |
-| **Last commit** | `7c518ca` — feat: Phase 7 analysis + A/B design |
+| **Current phase** | **ALL PHASES COMPLETE** |
+| **Next action** | Add GCP_SA_KEY + DBT_BQ_PROJECT to GitHub → open first PR to trigger CI |
+| **Last commit** | `(see below)` — feat: Phase 8 README + portfolio polish |
 | **Branch** | `master` |
 | **Remote** | https://github.com/vijhisha/olist-analytics-platform |
 
@@ -227,4 +227,28 @@ Run as two steps: `dbt build --exclude resource_type:snapshot` then `dbt snapsho
 | Logit AME of is_late | −18.7 pp on P(satisfied) *** |
 | A/B test sample needed | ~10,600 orders (~4 weeks) |
 
-### Phase 8 — README + Portfolio Polish ⏳ not started
+### Phase 8 — README + Portfolio Polish ✅
+**Commit:** `(see below)`
+
+**Completed:**
+- `README.md` — full rewrite: project pitch, architecture placeholder, annotated repo tree, Quick Start (7 steps), Common Commands table, Key Insights with real numbers, Data Dictionary, dashboard link placeholder
+- `Makefile` — `load`, `build`, `test`, `snapshot`, `freshness`, `docs`, `all`, `clean`
+- `docs/dashboard_spec.md` — 9 charts across 3 Looker Studio pages with exact field names, dimensions, metrics, and filter configs
+
+**All phases complete. Project is portfolio-ready.**
+
+## Final Resume Numbers
+
+| Metric | Value |
+|---|---|
+| dbt models | 18 |
+| dbt data tests | 124 |
+| Snapshots | 1 |
+| Sources | 9 |
+| Exposures | 1 |
+| Total orders modelled | 99,441 |
+| Total GMV (2016-2018) | R$15.7M |
+| Late-delivery rate | 8.1% |
+| Late delivery effect on reviews | −1.18 stars (OLS, controlled, p<0.001) |
+| Repeat-purchase rate | ~3% |
+| CI | GitHub Actions on every PR |
