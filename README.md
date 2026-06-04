@@ -330,3 +330,22 @@ make docs
 ```
 
 The docs site includes the full DAG lineage (raw → staging → intermediate → marts → Looker Studio exposure), column-level descriptions for all 18 models, and the 124 data-quality test definitions.
+
+A static single-file version is hosted via GitHub Pages at [`/docs/index.html`](docs/index.html). Enable it under **Settings → Pages → Source: Deploy from a branch → Branch: master, Folder: /docs**.
+
+---
+
+## Data Attribution
+
+The raw dataset is the **Brazilian E-Commerce Public Dataset by Olist**, published on Kaggle under the [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/) licence.
+
+> Olist. (2018). *Brazilian E-Commerce Public Dataset by Olist* [Data set]. Kaggle.
+> https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce
+
+The code in this repository is released under the [MIT License](LICENSE).
+
+---
+
+## License
+
+[MIT](LICENSE) © 2024-2026 Vijhisha
