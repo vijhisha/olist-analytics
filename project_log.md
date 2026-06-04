@@ -10,7 +10,7 @@
 |---|---|
 | **Current phase** | **ALL PHASES COMPLETE** |
 | **Next action** | Add GCP_SA_KEY + DBT_BQ_PROJECT to GitHub → open first PR to trigger CI |
-| **Last commit** | `(see below)` — feat: Phase 8 README + portfolio polish |
+| **Last commit** | `f81adb2` — feat: Phase 8 README + portfolio polish |
 | **Branch** | `master` |
 | **Remote** | https://github.com/vijhisha/olist-analytics-platform |
 
@@ -228,7 +228,7 @@ Run as two steps: `dbt build --exclude resource_type:snapshot` then `dbt snapsho
 | A/B test sample needed | ~10,600 orders (~4 weeks) |
 
 ### Phase 8 — README + Portfolio Polish ✅
-**Commit:** `(see below)`
+**Commit:** `f81adb2`
 
 **Completed:**
 - `README.md` — full rewrite: project pitch, architecture placeholder, annotated repo tree, Quick Start (7 steps), Common Commands table, Key Insights with real numbers, Data Dictionary, dashboard link placeholder
