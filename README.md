@@ -1,5 +1,7 @@
 # Olist Analytics Platform
 
+[![CI](https://github.com/vijhisha/olist-analytics/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/vijhisha/olist-analytics/actions/workflows/ci.yml)
+
 > An end-to-end analytics-engineering project on the [Olist Brazilian e-commerce dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) — built as a portfolio showcase for analytics-engineer and data-analyst roles.
 
 <!-- ARCHITECTURE DIAGRAM — drop your image at docs/architecture.png and uncomment:
