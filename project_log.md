@@ -8,11 +8,11 @@
 
 | Field | Value |
 |---|---|
-| **Current phase** | **ALL PHASES COMPLETE** |
-| **Next action** | Add GCP_SA_KEY + DBT_BQ_PROJECT to GitHub → open first PR to trigger CI |
-| **Last commit** | `f81adb2` — feat: Phase 8 README + portfolio polish |
-| **Branch** | `master` |
-| **Remote** | https://github.com/vijhisha/olist-analytics-platform |
+| **Current phase** | **ALL PHASES COMPLETE — finalize branch open as PR #1** |
+| **Next action** | Review + merge PR #1; enable GitHub Pages (Settings > Pages > master, /docs) |
+| **Last commit** | `355e84c` — feat: static dbt docs to docs/index.html (finalize branch) |
+| **Branch** | `finalize` (PR #1 open against master) |
+| **Remote** | https://github.com/vijhisha/olist-analytics |
 
 ---
 
@@ -236,6 +236,23 @@ Run as two steps: `dbt build --exclude resource_type:snapshot` then `dbt snapsho
 - `docs/dashboard_spec.md` — 9 charts across 3 Looker Studio pages with exact field names, dimensions, metrics, and filter configs
 
 **All phases complete. Project is portfolio-ready.**
+
+### Finalize — Portfolio hardening ✅ (PR #1, branch `finalize`)
+**Commits:** `57f1a5f` → `355e84c`
+
+**Completed:**
+- Security scan: no secrets in git history; `.gitignore` hardened (`.env`, `*.json`, `.gcp/`)
+- Data CSVs untracked with `git rm --cached`; `data/*.csv` added to .gitignore; `data/.gitkeep` added
+- README clone URL fixed: `olist-analytics-platform` → `olist-analytics`
+- CI badge added to top of README; ci.yml now triggers on push to master too
+- MIT LICENSE added; Olist CC BY-NC-SA attribution added to README
+- Notebook executed: all 10 cells have inline outputs + 3 matplotlib figures as embedded base64 PNG
+- `dbt docs generate --static` → `docs/index.html` (3.2 MB self-contained HTML)
+
+**Remaining human steps:**
+1. Add `GCP_SA_KEY` + `DBT_BQ_PROJECT` to GitHub repo secrets/variables if not done
+2. Merge PR #1
+3. Enable GitHub Pages: Settings → Pages → Branch: master, Folder: /docs
 
 ## Final Resume Numbers
 

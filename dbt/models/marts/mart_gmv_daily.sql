@@ -12,12 +12,12 @@
 with order_items as (
 
     select
-        date(oi.purchased_at)  as order_date,
         oi.order_id,
         oi.product_id,
-        oi.item_total
-    from {{ ref('fct_order_items') }} oi
-    inner join {{ ref('fct_orders') }} o using (order_id)
+        oi.item_total,
+        date(oi.purchased_at) as order_date,
+    from {{ ref('fct_order_items') }} as oi
+    inner join {{ ref('fct_orders') }} as o on oi.order_id = o.order_id
     where o.order_status not in ('canceled', 'unavailable')
 
 ),
@@ -27,10 +27,10 @@ with_category as (
     select
         oi.order_date,
         oi.order_id,
+        oi.item_total,
         coalesce(p.product_category_name_english, 'uncategorized') as product_category,
-        oi.item_total
-    from order_items oi
-    left join {{ ref('dim_products') }} p using (product_id)
+    from order_items as oi
+    left join {{ ref('dim_products') }} as p on oi.product_id = p.product_id
 
 ),
 
@@ -40,22 +40,22 @@ category_daily as (
         order_date,
         product_category,
         count(distinct order_id) as order_count,
-        count(*)                 as item_count,
-        sum(item_total)          as category_gmv
+        count(*) as item_count,
+        sum(item_total) as category_gmv,
     from with_category
-    group by 1, 2
+    group by order_date, product_category
 
 ),
 
 daily_orders as (
 
     select
-        date(purchased_at)  as order_date,
-        count(*)            as daily_order_count,
-        sum(order_value)    as daily_gmv
+        date(purchased_at) as order_date,
+        count(*) as daily_order_count,
+        sum(order_value) as daily_gmv,
     from {{ ref('fct_orders') }}
     where order_status not in ('canceled', 'unavailable')
-    group by 1
+    group by date(purchased_at)
 
 ),
 
@@ -67,15 +67,19 @@ final as (
         cd.order_count,
         cd.item_count,
         cd.category_gmv,
-        do.daily_order_count,
-        do.daily_gmv,
-        round(safe_divide(do.daily_gmv, do.daily_order_count), 2) as daily_aov,
-        round(safe_divide(cd.category_gmv,
-            sum(cd.category_gmv) over (partition by cd.order_date)), 4
-        ) as category_gmv_share
-    from category_daily cd
-    inner join daily_orders do using (order_date)
+        dly.daily_order_count,
+        dly.daily_gmv,
+        round(safe_divide(dly.daily_gmv, dly.daily_order_count), 2) as daily_aov,
+        round(
+            safe_divide(
+                cd.category_gmv,
+                sum(cd.category_gmv) over (partition by cd.order_date)
+            ), 4
+        ) as category_gmv_share,
+    from category_daily as cd
+    inner join daily_orders as dly on cd.order_date = dly.order_date
 
 )
 
-select * from final
+select *,
+from final

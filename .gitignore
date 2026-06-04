@@ -11,6 +11,10 @@ build/
 .env
 *.json
 !dbt/packages.yml
+.gcp/
+
+# Raw source data (large CSVs — download from Kaggle, see README)
+data/*.csv
 
 # dbt
 dbt/target/

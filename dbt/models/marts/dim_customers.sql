@@ -1,6 +1,6 @@
 with customers as (
 
-    select * from {{ ref('stg_customers') }}
+    select *, from {{ ref('stg_customers') }}
 
 ),
 
@@ -12,7 +12,7 @@ deduped as (
         customer_unique_id,
         zip_code_prefix,
         customer_city,
-        customer_state
+        customer_state,
     from customers
     qualify row_number() over (
         partition by customer_unique_id
@@ -21,4 +21,4 @@ deduped as (
 
 )
 
-select * from deduped
+select *, from deduped

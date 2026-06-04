@@ -1,6 +1,6 @@
 with orders as (
 
-    select * from {{ ref('stg_orders') }}
+    select *, from {{ ref('stg_orders') }}
 
 ),
 
@@ -36,10 +36,10 @@ enriched as (
             when delivered_to_customer_at is null then null
             when delivered_to_customer_at > estimated_delivery_date then true
             else false
-        end as is_late
+        end as is_late,
 
     from orders
 
 )
 
-select * from enriched
+select *, from enriched
