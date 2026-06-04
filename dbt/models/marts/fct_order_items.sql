@@ -13,19 +13,20 @@ with orders as (
         customer_id,
         order_status,
         purchased_at,
-        _loaded_date
+        _loaded_date,
     from {{ ref('stg_orders') }}
 
     {% if is_incremental() %}
-    -- on incremental runs, only process batches newer than what's already loaded
-    where _loaded_date > (select max(_loaded_date) from {{ this }})
+        -- on incremental runs, only process batches newer than what's already loaded
+        where _loaded_date > (select max(t._loaded_date), from {{ this }} as t)
     {% endif %}
 
 ),
 
 items as (
 
-    select * from {{ ref('int_order_items_priced') }}
+    select *,
+    from {{ ref('int_order_items_priced') }}
 
 ),
 
@@ -43,10 +44,11 @@ final as (
         i.price,
         i.freight_value,
         i.item_total,
-        o._loaded_date
-    from items i
-    inner join orders o using (order_id)
+        o._loaded_date,
+    from items as i
+    inner join orders as o on i.order_id = o.order_id
 
 )
 
-select * from final
+select *,
+from final

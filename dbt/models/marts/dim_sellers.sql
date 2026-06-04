@@ -1,6 +1,6 @@
 with sellers as (
 
-    select * from {{ ref('stg_sellers') }}
+    select *, from {{ ref('stg_sellers') }}
 
 ),
 
@@ -9,7 +9,7 @@ geo as (
     select
         zip_code_prefix,
         latitude,
-        longitude
+        longitude,
     from {{ ref('stg_geolocation') }}
 
 ),
@@ -22,10 +22,10 @@ final as (
         s.seller_city,
         s.seller_state,
         g.latitude,
-        g.longitude
-    from sellers s
-    left join geo g using (zip_code_prefix)
+        g.longitude,
+    from sellers as s
+    left join geo as g on s.zip_code_prefix = g.zip_code_prefix
 
 )
 
-select * from final
+select *, from final

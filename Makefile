@@ -2,7 +2,7 @@
 # Requires: GNU make, Python venv activated, env vars set (see .env.example)
 # On Windows: run via Git Bash, WSL, or `make` from a POSIX shell.
 
-.PHONY: load build test snapshot freshness docs clean help
+.PHONY: load build test snapshot freshness docs lint lint-fix clean help
 
 ## Load raw CSVs into BigQuery raw dataset (idempotent)
 load:
@@ -27,6 +27,14 @@ freshness:
 ## Generate dbt docs and serve locally at http://localhost:8080
 docs:
 	cd dbt && dbt docs generate && dbt docs serve
+
+## Lint all dbt SQL with sqlfluff (must run from project root; matches CI)
+lint:
+	cd dbt && sqlfluff lint models --processes 2
+
+## Auto-fix sqlfluff violations (run from dbt/ to avoid temp-file path bug on Windows)
+lint-fix:
+	cd dbt && sqlfluff fix models --processes 2
 
 ## Run the full pipeline end to end
 all: load build snapshot

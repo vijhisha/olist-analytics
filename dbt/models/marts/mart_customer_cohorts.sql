@@ -8,9 +8,9 @@ with valid_orders as (
 
     select
         c.customer_unique_id,
-        date_trunc(date(o.purchased_at), month) as order_month
-    from {{ ref('fct_orders') }} o
-    inner join {{ ref('stg_customers') }} c using (customer_id)
+        date_trunc(date(o.purchased_at), month) as order_month,
+    from {{ ref('fct_orders') }} as o
+    inner join {{ ref('stg_customers') }} as c on o.customer_id = c.customer_id
     where o.order_status not in ('canceled', 'unavailable')
 
 ),
@@ -19,7 +19,7 @@ first_purchase as (
 
     select
         customer_unique_id,
-        min(order_month) as cohort_month
+        min(order_month) as cohort_month,
     from valid_orders
     group by customer_unique_id
 
@@ -29,7 +29,7 @@ cohort_sizes as (
 
     select
         cohort_month,
-        count(*) as cohort_size
+        count(*) as cohort_size,
     from first_purchase
     group by cohort_month
 
@@ -41,10 +41,10 @@ cohort_activity as (
         fp.cohort_month,
         vo.order_month,
         date_diff(vo.order_month, fp.cohort_month, month) as periods_since_acquisition,
-        count(distinct vo.customer_unique_id)              as active_customers
-    from valid_orders vo
-    inner join first_purchase fp using (customer_unique_id)
-    group by 1, 2, 3
+        count(distinct vo.customer_unique_id) as active_customers,
+    from valid_orders as vo
+    inner join first_purchase as fp on vo.customer_unique_id = fp.customer_unique_id
+    group by fp.cohort_month, vo.order_month, date_diff(vo.order_month, fp.cohort_month, month)
 
 ),
 
@@ -56,10 +56,11 @@ final as (
         ca.periods_since_acquisition,
         cs.cohort_size,
         ca.active_customers,
-        round(safe_divide(ca.active_customers, cs.cohort_size), 4) as retention_rate
-    from cohort_activity ca
-    inner join cohort_sizes cs using (cohort_month)
+        round(safe_divide(ca.active_customers, cs.cohort_size), 4) as retention_rate,
+    from cohort_activity as ca
+    inner join cohort_sizes as cs on ca.cohort_month = cs.cohort_month
 
 )
 
-select * from final
+select *,
+from final
